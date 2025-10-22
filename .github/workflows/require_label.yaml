@@ -23,6 +23,12 @@ jobs:
 
             const requiredLabel = 'QA Approved';
 
+            const currentLabels = pr.labels.map(label => label.name);
+            if (!currentLabels.includes(requiredLabel)) {
+              core.setFailed(`Label "${requiredLabel}" is not currently present on the PR.`);
+              return;
+            }
+
             // Get timeline events
             const events = await github.paginate(
               github.rest.issues.listEventsForTimeline,
@@ -36,12 +42,14 @@ jobs:
             // Find if the label was added by someone other than the PR author
             const labelEvent = events.find(event =>
               event.event === 'labeled' &&
-              event.label?.name === requiredLabel &&
-              event.actor?.login !== prAuthor
+              event.label?.name === requiredLabel
             );
 
-            if (!labelEvent) {
-              core.setFailed(`The "${requiredLabel}" label must be added by someone other than the PR author (${prAuthor}).`);
-            } else {
-              console.log(`✅ Label "${requiredLabel}" was added by ${labelEvent.actor.login}.`);
+            if (labelEvent){
+              if (labelEvent.actor.login === prAuthor) {
+                core.setFailed(`The "${requiredLabel}" label was added by the PR author (${prAuthor}). It must be added by someone else.`);
+                return;
+              }else{
+                console.log(`The "${requiredLabel}" label was correctly added by ${labelEvent.actor.login}.`);
+              }
             }
