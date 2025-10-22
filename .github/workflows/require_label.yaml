@@ -16,12 +16,15 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = context.payload.pull_request.number;
+            const pr = context.payload.pull_request;
+            const prAuthor = pr.user.login;
+            const prNumber = pr.number;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const requiredLabel = 'QA Passed'; // change this
-            const requiredUser = 'pietroid'; // change this
 
+            const requiredLabel = 'QA Approved';
+
+            // Get timeline events
             const events = await github.paginate(
               github.rest.issues.listEventsForTimeline,
               {
@@ -31,14 +34,15 @@ jobs:
               }
             );
 
+            // Find if the label was added by someone other than the PR author
             const labelEvent = events.find(event =>
               event.event === 'labeled' &&
               event.label?.name === requiredLabel &&
-              event.actor?.login === requiredUser
+              event.actor?.login !== prAuthor
             );
 
             if (!labelEvent) {
-              core.setFailed(`The label "${requiredLabel}" must be added by "${requiredUser}".`);
+              core.setFailed(`The "${requiredLabel}" label must be added by someone other than the PR author (${prAuthor}).`);
             } else {
-              console.log(`✅ Label "${requiredLabel}" was added by "${requiredUser}".`);
+              console.log(`✅ Label "${requiredLabel}" was added by ${labelEvent.actor.login}.`);
             }
