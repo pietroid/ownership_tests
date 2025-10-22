@@ -5,7 +5,7 @@ on:
     types: [labeled, unlabeled, synchronize, opened, reopened]
 
 jobs:
-  check-label-author:
+  check-qa-approval:
     runs-on: ubuntu-latest
     permissions:
       contents: read
