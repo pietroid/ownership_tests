@@ -53,12 +53,12 @@ jobs:
 
       # 3️⃣ Create PR proposed-release-changes -> release-candidate
       - name: Create PR (proposed-release-changes → release-candidate)
-        run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+        run: gh pr create -B release-candidate -H proposed-release-changes --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # 4️⃣ Create PR release-candidate -> main
-      - name: Create PR (release-candidate → development)
-        run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+      - name: Create PR (release-candidate → main)
+        run: gh pr create -B main -H release-candidate --title 'Merge release-candidate into main' --body 'Created by Github action'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
