@@ -1,0 +1,83 @@
+name: Create new release 🚀
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  setup-release:
+    name: Create release-candidate and PRs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      # 1️⃣ Create release-candidate from main
+      - name: Create release-candidate branch
+        run: |
+          git checkout main
+          git pull origin main
+          git checkout -b release-candidate
+          git push origin release-candidate --force
+
+      # 2️⃣ Create proposed-release-changes from development and bump version
+      - name: Create proposed-release-changes branch
+        run: |
+          git checkout development
+          git pull origin development
+          git checkout -b proposed-release-changes
+          
+          # Bump version in pubspec.yaml
+          CURRENT_VERSION=$(grep 'version:' pubspec.yaml | awk '{print $2}')
+          IFS='+' read -r VERSION BUILD <<< "$CURRENT_VERSION"
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH+1"
+          sed -i "s/version: $CURRENT_VERSION/version: $NEW_VERSION/" pubspec.yaml
+          
+          git push origin proposed-release-changes --force
+
+      # 3️⃣ Create PR proposed-release-changes -> release-candidate
+      - name: Create PR (proposed-release-changes → release-candidate)
+        id: pr1
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          head: proposed-release-changes
+          base: release-candidate
+          title: "Proposed Release Changes → Release Candidate"
+          body: |
+            This PR merges the proposed release updates into the release-candidate branch.
+            
+            Approval required from the release team before stabilization starts.
+          draft: false
+
+      # 4️⃣ Create PR release-candidate -> development (bypass approval)
+      - name: Create PR (release-candidate → development)
+        id: pr2
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          head: release-candidate
+          base: development
+          title: "Release Candidate → Development (Post-Release Sync)"
+          body: |
+            This PR keeps `development` up to date with the final state of `release-candidate`.
+            
+            ⚠️ Should remain blocked until the end of the stabilization process.
+
+      - name: Output created PR links
+        run: |
+          echo "Proposed → Candidate PR: ${{ steps.pr1.outputs.pull-request-url }}"
+          echo "Candidate → Development PR: ${{ steps.pr2.outputs.pull-request-url }}"
