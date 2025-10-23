@@ -53,35 +53,12 @@ jobs:
 
       # 3️⃣ Create PR proposed-release-changes -> release-candidate
       - name: Create PR (proposed-release-changes → release-candidate)
-        id: pr1
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: proposed-release-changes
-          base: release-candidate
-          title: "Proposed Release Changes → Release Candidate"
-          body: |
-            This PR merges the proposed release updates into the release-candidate branch.
-            
-            Approval required from the release team before stabilization starts.
-          draft: false
+        run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # 4️⃣ Create PR release-candidate -> development (bypass approval)
+      # 4️⃣ Create PR release-candidate -> main
       - name: Create PR (release-candidate → development)
-        id: pr2
-        uses: peter-evans/create-pull-request@v6
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: release-candidate
-          base: development
-          title: "Release Candidate → Development (Post-Release Sync)"
-          body: |
-            This PR keeps `development` up to date with the final state of `release-candidate`.
-            
-            ⚠️ Should remain blocked until the end of the stabilization process.
-          draft: false
-
-      - name: Output created PR links
-        run: |
-          echo "Proposed → Candidate PR: ${{ steps.pr1.outputs.pull-request-url }}"
-          echo "Candidate → Development PR: ${{ steps.pr2.outputs.pull-request-url }}"
+        run: gh pr create -B base_branch -H branch_to_merge --title 'Merge branch_to_merge into base_branch' --body 'Created by Github action'
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
