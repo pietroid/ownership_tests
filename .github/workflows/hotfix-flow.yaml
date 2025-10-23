@@ -1,0 +1,47 @@
+name: Hotfix Flow
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_hashes:
+        description: 'Commit hashes to cherry-pick (comma-separated)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  hotfix:
+    name: Create hotfix PR from commits
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      
+      - name: Create hotfix branch
+        run: |
+          git checkout -b hotfix/${{ github.event.inputs.commit_hashes }}
+      
+      - name: Cherry-pick commits
+        run: |
+          IFS=',' read -ra COMMITS <<< "${{ github.event.inputs.commit_hashes }}"
+          for commit in "${COMMITS[@]}"; do
+            git cherry-pick "$commit"
+          done
+      
+      - name: Push hotfix branch
+        run: |
+          git push origin hotfix/${{ github.event.inputs.commit_hashes }}
+      
+      - name: Create pull request
+        run: |
+          gh pr create --title "Hotfix: ${{ github.event.inputs.commit_hashes }}" --body "Hotfix PR created by GitHub Actions" --head hotfix/${{ github.event.inputs.commit_hashes }} --base release-candidate
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

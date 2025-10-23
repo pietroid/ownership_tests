@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   setup-release:
-    name: Create release-candidate and PRs
+    name: Create release-candidate proposal
     runs-on: ubuntu-latest
 
     steps:
@@ -23,21 +23,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 1️⃣ Create release-candidate from main
-      - name: Create release-candidate branch
-        run: |
-          git checkout main
-          git pull origin main
-          git checkout -b release-candidate
-          git push origin release-candidate --force
-
-      # 2️⃣ Create proposed-release-changes from development and bump version
-      - name: Create proposed-release-changes branch
+      # 2️⃣ Create proposed-release-candidate from development and bump version
+      - name: Create proposed-release-candidate branch
         run: |
           git checkout development
           git pull origin development
-          git checkout -b proposed-release-changes
-          
+          git checkout -b proposed-release-candidate
+
           # Bump version in pubspec.yaml (patch increment)
           current_version=$(grep '^version:' pubspec.yaml | awk '{print $2}')
           IFS='.' read -r major minor patch <<< "${current_version%%+*}"
@@ -48,9 +40,9 @@ jobs:
           git add pubspec.yaml
           git commit -m "chore: bump version to $new_version"
           
-          git push origin proposed-release-changes --force      
-
-      # 3️⃣ Create PR proposed-release-changes -> release-candidate
+          git push origin proposed-release-candidate --force  
+      
+      # Create PR proposed-release-changes -> release-candidate
       - name: Create PR (proposed-release-changes → release-candidate)
         run: |
           # Close existing PR if it exists
@@ -58,27 +50,6 @@ jobs:
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          gh pr create -B release-candidate -H proposed-release-changes --title 'Merge proposed-release-changes into release-candidate' --body 'Created by Github action'
+          gh pr create -B release-candidate -H proposed-release-changes --title 'New release proposal: XX.YY.ZZ' --body 'Created by Github action'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # 4️⃣ Create PR release-candidate -> development
-      - name: Create PR (release-candidate → development)
-        run: |
-          # Close existing PR if it exists
-          existing_pr=$(gh pr list -B development -H release-candidate --json number --jq '.[0].number')
-          if [ -n "$existing_pr" ]; then
-            gh pr close "$existing_pr"
-          fi
-          gh pr create -B development -H release-candidate --title 'Merge release-candidate into development' --body 'Created by Github action'
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Approve PR (proposed-release-changes → release-candidate)
-        run: |
-          pr_number=$(gh pr list -B release-candidate -H proposed-release-changes --json number --jq '.[0].number')
-          if [ -n "$pr_number" ]; then
-            gh pr review "$pr_number" --approve --body "Auto-approved by GitHub Actions"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
