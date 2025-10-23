@@ -65,7 +65,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          head: proposed-release-changes
+          branch: proposed-release-changes
           base: release-candidate
           title: "Proposed Release Changes → Release Candidate"
           body: |
@@ -80,7 +80,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          head: release-candidate
+          branch: release-candidate
           base: development
           title: "Release Candidate → Development (Post-Release Sync)"
           body: |
