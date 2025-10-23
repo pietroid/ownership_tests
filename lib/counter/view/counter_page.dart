@@ -32,11 +32,6 @@ class CounterView extends StatelessWidget {
             onPressed: () => context.read<CounterCubit>().increment(),
             child: const Icon(Icons.add),
           ),
-          const SizedBox(height: 8),
-          FloatingActionButton(
-            onPressed: () => context.read<CounterCubit>().decrement(),
-            child: const Icon(Icons.remove),
-          ),
         ],
       ),
     );
@@ -50,6 +45,6 @@ class CounterText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final count = context.select((CounterCubit cubit) => cubit.state);
-    return Text('$count', style: theme.textTheme.displayLarge);
+    return Text('$count count', style: theme.textTheme.displayLarge);
   }
 }
