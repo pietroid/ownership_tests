@@ -48,9 +48,7 @@ jobs:
           git add pubspec.yaml
           git commit -m "chore: bump version to $new_version"
           
-          git push origin proposed-release-changes --force
-          
-      
+          git push origin proposed-release-changes --force      
 
       # 3️⃣ Create PR proposed-release-changes -> release-candidate
       - name: Create PR (proposed-release-changes → release-candidate)
@@ -75,3 +73,12 @@ jobs:
           gh pr create -B development -H release-candidate --title 'Merge release-candidate into development' --body 'Created by Github action'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Approve PR (proposed-release-changes → release-candidate)
+        run: |
+          pr_number=$(gh pr list -B release-candidate -H proposed-release-changes --json number --jq '.[0].number')
+          if [ -n "$pr_number" ]; then
+            gh pr review "$pr_number" --approve --body "Auto-approved by GitHub Actions"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
