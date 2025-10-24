@@ -6,6 +6,10 @@ on:
     types: [closed]
     branches:
       - development # This is the target branch where the merge happens
+  
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   deploy:
