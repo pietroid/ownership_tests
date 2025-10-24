@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:workflow_lab/counter/counter.dart';
 import 'package:workflow_lab/l10n/l10n.dart';
 
+// The hotfix goes here
 class App extends StatelessWidget {
   const App({super.key});
 
