@@ -14,12 +14,6 @@ fi
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 
 # Update version in pubspec.yaml
-if grep -q "^version:" "$PUBSPEC_FILE"; then
-    # Replace existing version line
-    sed -i "" "s/^version:.*/version: $VERSION/" "$PUBSPEC_FILE"
-else
-    # Add version line at the top
-    sed -i "" "1s/^/version: $VERSION\n/" "$PUBSPEC_FILE"
-fi
+sed -i "s/^version:.*/version: $VERSION/" "$PUBSPEC_FILE"
 
 echo "Updated pubspec.yaml to version $VERSION."
