@@ -1,3 +1,4 @@
+## This workflow when the version on main is updated, it creates a tag and a release, and creates a PR to merge main back to development.
 name: Deploy on specific branch merge
 
 on:
@@ -5,6 +6,8 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'version.txt'
   
 permissions:
   contents: write
@@ -13,7 +16,6 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' && github.event.pull_request.head.ref == 'release-candidate'
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,11 +26,15 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git fetch --tags
+          
 
       - name: Create and push tag
         run: |
+          git fetch --tags
+          
           CURRENT_VERSION=$(cat version.txt)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+          
           git tag ${CURRENT_VERSION}
           git push origin ${CURRENT_VERSION}
 
@@ -37,8 +43,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Merge main to develop
+      - name: Merge main to development
         run: |
-          gh pr create --title "Release ${CURRENT_VERSION}" --body "Merge from main to develop" --head main --base develop
+          gh pr create --title "Merge ${CURRENT_VERSION} from main to development" --body "Merge from main to development" --head main --base development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

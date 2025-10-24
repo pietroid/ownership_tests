@@ -1,3 +1,4 @@
+## This workflow is already triggered by the push to development from the first part of the release process.
 name: Propose changes for new release 
 
 on:
@@ -23,27 +24,41 @@ jobs:
         with:
           fetch-depth: 0
 
+      ## This is for cases where version is bumped on hotfixes and comes from main branch.
+      - name: Skip of tag already exists
+        run: |
+          git fetch --tags
+          version=$(cat version.txt)
+          if git rev-parse "v$version" >/dev/null 2>&1; then
+            echo "Tag v$version already exists. Skipping release proposal."
+            exit 0
+          else
+            echo "Tag v$version does not exist. Proceeding..."
+          fi
+
       - name: Set up Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      # 2️⃣ Create proposed-release-candidate from development and bump version
       - name: Create proposed-release-candidate branch
         run: |
           git checkout development
           git pull origin development
           git checkout -b proposed-release-candidate
-          git push origin proposed-release-candidate --force  
-      
-      # Create PR proposed-release-changes -> release-candidate
-      - name: Create PR (proposed-release-changes → release-candidate)
+          git push origin proposed-release-candidate --force
+
+      - name: Create PR (proposed-release-candidate → release-candidate)
         run: |
           # Close existing PR if it exists
           existing_pr=$(gh pr list -B release-candidate -H proposed-release-candidate --json number --jq '.[0].number')
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          gh pr create -B release-candidate -H proposed-release-candidate --title 'New release proposal: XX.YY.ZZ' --body 'Created by Github action'
+
+          CURRENT_VERSION=$(cat version.txt)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+          gh pr create -B release-candidate -H proposed-release-candidate --title "New release proposal: $CURRENT_VERSION" --body "What the next release will look like."
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

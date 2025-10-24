@@ -1,10 +1,11 @@
-name: Request hotfix
+## Use this workflow manually to create a hotfix PR from specific commits of the development branch to the release-candidate branch.
+name: Create hotfix request 🐞
 
 on:
   workflow_dispatch:
     inputs:
       commit_hashes:
-        description: 'Commit hashes to cherry-pick (comma-separated)'
+        description: 'Put here the commit hashes from development branch to include in the hotfix, separated by commas'
         required: true
         type: string
 

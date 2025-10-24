@@ -1,3 +1,5 @@
+## This workflow is triggered every time there is a push to release-candidate branch.
+## This automatically generates the builds via fastlane and creates a PR to main branch.
 name: Release candidate
 
 on:
@@ -25,7 +27,6 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-      # Create PR release-candidate -> development to have as ongoing development
       - name: Create PR (release-candidate → main)
         run: |
           # Close existing PR if it exists
@@ -33,7 +34,11 @@ jobs:
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          gh pr create -B main -H release-candidate --title 'Release in progress: XX.YY.ZZ' --body 'Created by Github action'
+          
+          CURRENT_VERSION=$(cat version.txt)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+          gh pr create -B main -H release-candidate --title "Release in progress: $CURRENT_VERSION" --body "Merge this PR when the release is stabilized."
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

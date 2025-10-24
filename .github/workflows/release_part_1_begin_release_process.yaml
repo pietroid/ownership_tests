@@ -1,4 +1,5 @@
-name: Start new release process 🚀
+## Use this workflow to begin the release process by bumping the version on the development branch.
+name: Begin release process 🚀
 
 on:
   workflow_dispatch:
@@ -9,7 +10,7 @@ permissions:
 
 jobs:
   bump-version:
-    name: Bump version and create release-candidate branch
+    name: Bump version on development
     runs-on: ubuntu-latest
 
     steps:
@@ -29,7 +30,6 @@ jobs:
           git pull origin development
           git checkout -b bump-version
 
-          # Bump version in version.txt (patch increment)
           cd scripts
           ./bump_version.sh
           ./bump_flutter_version.sh
@@ -37,7 +37,11 @@ jobs:
           cd ..
 
           git add version.txt pubspec.yaml
-          git commit -m "Bump version to $(cat version.txt)"
+
+          CURRENT_VERSION=$(cat version.txt)
+          echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
+
+          git commit -m "Release: Bump version to $CURRENT_VERSION"
           git push origin bump-version --force
 
       - name: Create PR (bump-version → development)
@@ -47,7 +51,6 @@ jobs:
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          new_version=$(cat version.txt)
-          gh pr create -B development -H bump-version --title "Bump version to $new_version" --body "Automated version bump to $new_version"
+          gh pr create -B development -H bump-version --title "Release: Bump version to $CURRENT_VERSION" --body "Automated version bumping to $CURRENT_VERSION"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
