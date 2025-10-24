@@ -14,6 +14,6 @@ fi
 VERSION=$(cat "$VERSION_FILE" | tr -d '[:space:]')
 
 # Update version in pubspec.yaml
-sed -i "s/^version:.*/version: $VERSION/" "$PUBSPEC_FILE"
+sed -i.bak "s/^version:.*/version: $VERSION/" "$PUBSPEC_FILE"
 
 echo "Updated pubspec.yaml to version $VERSION."
