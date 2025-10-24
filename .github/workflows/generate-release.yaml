@@ -1,0 +1,40 @@
+name: Deploy on specific branch merge
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - development # This is the target branch where the merge happens
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'development' && github.event.pull_request.head.ref == 'release-candidate'
+    steps:
+      - name: Set up Git
+        run: |
+          git fetch --tags
+
+      - name: Determine new version tag
+        id: version
+        run: |
+          # Example: auto-increment patch version based on latest tag
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $latest_tag"
+          IFS='.' read -r major minor patch <<<"${latest_tag#v}"
+          new_tag="v$major.$minor.$((patch+1))"
+          echo "new_tag=$new_tag" >> $GITHUB_OUTPUT
+
+      - name: Create and push tag
+        run: |
+          git tag ${{ steps.version.outputs.new_tag }}
+          git push origin ${{ steps.version.outputs.new_tag }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.new_tag }}
+          name: "Release ${{ steps.version.outputs.new_tag }}"
+          body: "Automated release from merge-candidate → development."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
