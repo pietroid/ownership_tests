@@ -1,0 +1,49 @@
+name: Start new release process 🚀
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  bump-version:
+    name: Bump version and create release-candidate branch
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create release-candidate branch and bump version
+        run: |
+          git checkout development
+          git pull origin development
+          git checkout -b bump-version
+
+          # Bump version in version.txt (patch increment)
+          ./scripts/bump_version.sh
+          ./scripts/bump_flutter_version.sh
+
+          git add version.txt pubspec.yaml
+          git commit -m "Bump version to $(cat version.txt)"
+          git push origin bump-version --force
+
+      - name: Create PR (bump-version → development)
+        run: |
+          # Close existing PR if it exists
+          existing_pr=$(gh pr list -B development -H bump-version --json number --jq '.[0].number')
+          if [ -n "$existing_pr" ]; then
+            gh pr close "$existing_pr"
+          fi
+          gh pr create -B development -H bump-version --title "Bump version to $new_version" --body "Automated version bump to $new_version"
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

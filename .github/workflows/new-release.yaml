@@ -1,7 +1,12 @@
-name: Create new release 🚀
+name: Propose changes for new release 
 
 on:
   workflow_dispatch:
+  merge:
+    branches:
+      - development
+    paths:
+      - 'version.txt'
 
 permissions:
   contents: write
@@ -29,17 +34,6 @@ jobs:
           git checkout development
           git pull origin development
           git checkout -b proposed-release-candidate
-
-          # Bump version in pubspec.yaml (patch increment)
-          current_version=$(grep '^version:' pubspec.yaml | awk '{print $2}')
-          IFS='.' read -r major minor patch <<< "${current_version%%+*}"
-          new_patch=$((patch + 1))
-          new_version="$major.$minor.$new_patch"
-          sed -i "s/^version: .*/version: $new_version/" pubspec.yaml
-
-          git add pubspec.yaml
-          git commit -m "chore: bump version to $new_version"
-          
           git push origin proposed-release-candidate --force  
       
       # Create PR proposed-release-changes -> release-candidate
