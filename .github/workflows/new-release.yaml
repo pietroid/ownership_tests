@@ -46,10 +46,10 @@ jobs:
       - name: Create PR (proposed-release-changes → release-candidate)
         run: |
           # Close existing PR if it exists
-          existing_pr=$(gh pr list -B release-candidate -H proposed-release-changes --json number --jq '.[0].number')
+          existing_pr=$(gh pr list -B release-candidate -H proposed-release-candidate --json number --jq '.[0].number')
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          gh pr create -B release-candidate -H proposed-release-changes --title 'New release proposal: XX.YY.ZZ' --body 'Created by Github action'
+          gh pr create -B release-candidate -H proposed-release-candidate --title 'New release proposal: XX.YY.ZZ' --body 'Created by Github action'
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
