@@ -1,6 +1,6 @@
 name: workflow_lab
 description: A Very Good Project created by Very Good CLI.
-version: 25.10.24-3+127
+version: 25.10.24-4+128
 publish_to: none
 
 environment:
