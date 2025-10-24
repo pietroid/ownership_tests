@@ -1,4 +1,4 @@
-name: Hotfix Flow
+name: Request hotfix
 
 on:
   workflow_dispatch:
@@ -27,9 +27,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
       
-      - name: Create hotfix branch
+      - name: Create hotfix branch from release-candidate
         run: |
-          git checkout -b hotfix/${{ github.event.inputs.commit_hashes }}
+          git checkout release-candidate
+          git pull origin release-candidate
+          VERSION=$(cat version.txt)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          git checkout -b hotfix/$VERSION
       
       - name: Cherry-pick commits
         run: |
@@ -38,12 +42,23 @@ jobs:
             git cherry-pick "$commit"
           done
       
+      - name: bump version for hotfix
+        run: |
+          cd scripts
+          ./bump_version.sh
+          ./bump_flutter_version.sh
+
+          cd ..
+
+          git add version.txt pubspec.yaml
+          git commit -m "Bump version to $(cat version.txt)"
+      
       - name: Push hotfix branch
         run: |
-          git push origin hotfix/${{ github.event.inputs.commit_hashes }}
-      
+          git push origin hotfix/$VERSION
+
       - name: Create pull request
         run: |
-          gh pr create --title "Hotfix: ${{ github.event.inputs.commit_hashes }}" --body "Hotfix PR created by GitHub Actions" --head hotfix/${{ github.event.inputs.commit_hashes }} --base release-candidate
+          gh pr create --title "Hotfix on version $VERSION" --body "Hotfix PR with the following commits: ${{ github.event.inputs.commit_hashes }}" --head hotfix/$VERSION --base release-candidate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
