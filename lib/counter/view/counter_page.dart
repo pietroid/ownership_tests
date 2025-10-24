@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:workflow_lab/counter/counter.dart';
 import 'package:workflow_lab/l10n/l10n.dart';
 
+/// adding comment
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
