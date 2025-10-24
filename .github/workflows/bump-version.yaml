@@ -30,8 +30,11 @@ jobs:
           git checkout -b bump-version
 
           # Bump version in version.txt (patch increment)
-          ./scripts/bump_version.sh
-          ./scripts/bump_flutter_version.sh
+          cd scripts
+          ./bump_version.sh
+          ./bump_flutter_version.sh
+
+          cd ..
 
           git add version.txt pubspec.yaml
           git commit -m "Bump version to $(cat version.txt)"
