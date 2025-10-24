@@ -1,0 +1,56 @@
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/App.framework
+ios/Flutter/engine/
+ios/Pods/
+ios/Runner.xcworkspace/
+ios/Runner.xcuserdatad/
+macos/Flutter/Flutter-Debug.xcconfig
+macos/Flutter/Flutter-Release.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Pods/
+macos/Runner.xcworkspace/
+macos/Runner.xcuserdatad/
+windows/flutter/ephemeral/
+linux/flutter/ephemeral/
+web/.dart_tool/
+web/build/
+*.iml
+
+# VS Code
+.vscode/
+
+# IntelliJ related
+.idea/
+*.iml
+
+# Xcode
+*.xcworkspace
+*.xcuserdatad
+DerivedData/
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Android Studio
+*.jks
+
+# Others
+*.log
+*.lock
+*.tmp
+*.swp
+*.DS_Store
+*.class
+*.jar
+*.war
+*.ear
