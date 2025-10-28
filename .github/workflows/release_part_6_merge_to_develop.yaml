@@ -8,7 +8,7 @@ on:
 
 jobs:
   auto-merge:
-    if: github.base_ref == 'develop' && github.head_ref == 'main'
+    if: github.base_ref == 'development' && github.head_ref == 'main'
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
