@@ -1,5 +1,5 @@
 ## This workflow when the version on main is updated, it creates a tag and a release, and creates a PR to merge main back to development.
-name: Deploy on specific branch merge
+name: Promote release to main 🎉
 
 on:
   workflow_dispatch:
@@ -38,13 +38,15 @@ jobs:
           git tag ${CURRENT_VERSION}
           git push origin ${CURRENT_VERSION}
 
-          gh release create ${CURRENT_VERSION} --title "Release ${CURRENT_VERSION}" --notes "Automated release."
+          ./scripts/generate_changelog.sh main release-candidate
+
+          gh release create ${CURRENT_VERSION} --title "Release ${CURRENT_VERSION}" --notes "$(cat changelog.txt)"
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Merge main to development
         run: |
-          gh pr create --title "Merge ${CURRENT_VERSION} from main to development" --body "Merge from main to development" --head main --base development
+          gh pr create --title "Release: Merge ${CURRENT_VERSION} from main to development" --body "Merge from main back to development.\n\n**Note:** always use merge instead of squash and merge." --head main --base development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

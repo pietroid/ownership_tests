@@ -51,6 +51,6 @@ jobs:
           if [ -n "$existing_pr" ]; then
             gh pr close "$existing_pr"
           fi
-          gh pr create -B development -H bump-version --title "Release: Bump version to $CURRENT_VERSION" --body "Automated version bumping to $CURRENT_VERSION"
+          gh pr create -B development -H bump-version --title "Release: Bump version to $CURRENT_VERSION" --body "Automated version bumping for incoming release $CURRENT_VERSION"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

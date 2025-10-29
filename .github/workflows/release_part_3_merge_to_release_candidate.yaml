@@ -1,6 +1,6 @@
 ## This workflow is triggered every time there is a push to release-candidate branch.
 ## This automatically generates the builds via fastlane and creates a PR to main branch.
-name: Release candidate
+name: Merge changes to release-candidate and generate build
 
 on:
   push:
@@ -38,7 +38,9 @@ jobs:
           CURRENT_VERSION=$(cat version.txt)
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-          gh pr create -B main -H release-candidate --title "Release in progress: $CURRENT_VERSION" --body "Merge this PR when the release is stabilized."
+          ./scripts/generate_changelog.sh main release-candidate
+
+          gh pr create -B main -H release-candidate --title "Release: $CURRENT_VERSION in progress." --body "Merge this PR when the release is stable for 100% of the users. \n \n This release contains: $(cat changelog.txt)"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

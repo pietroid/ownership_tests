@@ -52,7 +52,7 @@ jobs:
           cd ..
 
           git add version.txt pubspec.yaml
-          git commit -m "Bump version to $(cat version.txt)"
+          git commit -m "Release: Bump version to $(cat version.txt)"
       
       - name: Push hotfix branch
         run: |
@@ -60,6 +60,6 @@ jobs:
 
       - name: Create pull request
         run: |
-          gh pr create --title "Hotfix on version $VERSION" --body "Hotfix PR with the following commits: ${{ github.event.inputs.commit_hashes }}" --head hotfix/$VERSION --base release-candidate
+          gh pr create --title "Release: Hotfix on $VERSION" --body "Hotfix PR with the following commits: ${{ github.event.inputs.commit_hashes }}" --head hotfix/$VERSION --base release-candidate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
