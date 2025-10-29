@@ -21,7 +21,7 @@ class App extends StatelessWidget {
     );
   }
 }
-
+// feature 2
 // Change 1.
 // Change 2.
 // Change 3.
@@ -38,3 +38,4 @@ class App extends StatelessWidget {
 // hotfix 3
 // just another change
 // hotfix 4
+// feature 1
