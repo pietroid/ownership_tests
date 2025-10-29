@@ -40,7 +40,7 @@ jobs:
           git tag ${CURRENT_VERSION}
           git push origin ${CURRENT_VERSION}
 
-          ./scripts/generate_changelog.sh $CURRENT_VERSION $LAST_TAG
+          ./scripts/generate_changelog.sh $CURRENT_VERSION $LAST_TAG --tags=true
 
           gh release create ${CURRENT_VERSION} --title "Release ${CURRENT_VERSION}" --notes "$(cat changelog.txt)"
 
