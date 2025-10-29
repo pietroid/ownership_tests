@@ -38,9 +38,9 @@ jobs:
           CURRENT_VERSION=$(cat version.txt)
           echo "CURRENT_VERSION=$CURRENT_VERSION" >> $GITHUB_ENV
 
-          ./scripts/generate_changelog.sh main release-candidate
+          ./scripts/generate_changelog.sh release-candidate main
 
-          gh pr create -B main -H release-candidate --title "Release: $CURRENT_VERSION in progress." --body $'Merge this PR when the release is stable for 100% of the users. \n \n This release contains:'"$(cat changelog.txt)"
+          gh pr create -B main -H release-candidate --title "Release: $CURRENT_VERSION in progress." --body $'Merge this PR when the release is stable for 100% of the users. \n \n This release contains: \n \n'"$(cat changelog.txt)"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     
