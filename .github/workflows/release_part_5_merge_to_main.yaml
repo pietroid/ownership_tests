@@ -47,6 +47,6 @@ jobs:
 
       - name: Merge main to development
         run: |
-          gh pr create --title "Release: Merge ${CURRENT_VERSION} from main to development" --body "Merge from main back to development.\n\n**Note:** always use merge instead of squash and merge." --head main --base development
+          gh pr create --title "Release: Merge ${CURRENT_VERSION} from main to development" --body $'Merge from main back to development.\n\n**Note:** always use merge instead of squash and merge.' --head main --base development
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
