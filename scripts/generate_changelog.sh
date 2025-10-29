@@ -8,7 +8,7 @@ HEAD_BRANCH="${1:-HEAD}"
 git fetch origin "$BASE_BRANCH"
 git fetch origin "$HEAD_BRANCH"
 
-git log origin/"$BASE_BRANCH"..origin/"$HEAD_BRANCH" --pretty=format:"%s" \
+git log "$BASE_BRANCH".."$HEAD_BRANCH" --pretty=format:"%s" \
     | grep -v -E '^(Release: |[Mm]erge)' \
     | sed 's/^/- /' > changelog.txt
     
