@@ -40,7 +40,7 @@ jobs:
 
           ./scripts/generate_changelog.sh main release-candidate
 
-          gh pr create -B main -H release-candidate --title "Release: $CURRENT_VERSION in progress." --body "Merge this PR when the release is stable for 100% of the users. \n \n This release contains: $(cat changelog.txt)"
+          gh pr create -B main -H release-candidate --title "Release: $CURRENT_VERSION in progress." --body $'Merge this PR when the release is stable for 100% of the users. \n \n This release contains:'"$(cat changelog.txt)"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     

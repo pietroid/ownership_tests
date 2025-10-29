@@ -60,6 +60,6 @@ jobs:
 
       - name: Create pull request
         run: |
-          gh pr create --title "Release: Hotfix on $VERSION" --body $'Hotfix PR with the following commits: \n\n ${{ github.event.inputs.commit_hashes }}' --head hotfix/$VERSION --base release-candidate
+          gh pr create --title "Release: Hotfix on $VERSION" --body $'Hotfix PR with the following commits: \n\n'"${{ github.event.inputs.commit_hashes }}" --head hotfix/$VERSION --base release-candidate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
