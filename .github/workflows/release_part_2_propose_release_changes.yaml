@@ -61,6 +61,6 @@ jobs:
 
           ./scripts/generate_changelog.sh proposed-release-candidate release-candidate
 
-          gh pr create -B release-candidate -H proposed-release-candidate --title "Release: New version proposal $CURRENT_VERSION" --body $'This release contains:\n\n'"$(cat changelog.txt)""
+          gh pr create -B release-candidate -H proposed-release-candidate --title "Release: New version proposal $CURRENT_VERSION" --body $'This release contains:\n\n'"$(cat changelog.txt)"
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
